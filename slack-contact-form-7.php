@@ -55,16 +55,37 @@ function wp_slack_wpcf7_submit( $events ) {
 				( ! empty( $result['status'] ) && 'mail_sent' === $result['status'] )
 			);
 
-			if ( $sent ) {
-				return apply_filters( 'slack_wpcf7_submit_message',
-					sprintf(
-						__( 'Someone just sent a message through *%s* _Contact Form 7_. Check your email!', 'slack' ),
-						is_callable( array( $form, 'title' ) ) ? $form->title() : $form->title
-					),
-					$form,
-					$result
-				);
-			}
+			
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+if ( $sent ) {
+  $submission = WPCF7_Submission::get_instance();
+  $formdata = $submission->get_posted_data();
+  $contents = '';
+  foreach ($formdata as $key => $val) {
+    if (substr($key, 0, 1) != '_') {
+     $contents .= $key . ':' . $val . "\n";
+    }
+  }
+  return apply_filters( 'slack_wpcf7_submit_message',
+  $contents,
+  $form,
+  $result
+  );
+}
 
 			return false;
 		}
